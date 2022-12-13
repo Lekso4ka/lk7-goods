@@ -1,8 +1,14 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import Ctx from "../Ctx";
+import { useDispatch } from "react-redux";
 
 export default ({name, price}) => {
-    const {setCart, setGoods} = useContext(Ctx);
+    const dispatch = useDispatch(state => state.storeReducer)
+    const {setCart} = useContext(Ctx);
+    const [inpName, setName] = useState(name);
+    const [inpPrice, setPrice] = useState(name);
+    const [chName, setChName] = useState(false);
+    const [chPrise, setChPrice] = useState(false);
 
     const add = (e) => {
         setCart(gds => {
@@ -25,10 +31,50 @@ export default ({name, price}) => {
         });
     }
     const remove = (e) => {
-        setGoods(gds => gds.filter(el => el.name !== name))
+        dispatch({type: "DEL", payload: {
+            name: name
+        }})
+    }
+    const updName = () => {
+        setChName(false);
+        dispatch({
+            type: "CHNAME",
+            payload: {
+                newName: inpName,
+                oldName: name
+            }
+        });
     }
     return <li className="card">
-        <h3>{name}</h3>
+        <div>
+            {
+                !chName ?
+                <>
+                    <h3>{name}</h3>
+                    <button 
+                        onClick={e => {
+                            setChName(true);
+                        }}
+                    >ch</button>
+                </>
+                :
+                <>
+                    <input 
+                        type="text" 
+                        value={inpName}
+                        onChange={e => setName(e.target.value)}
+                    />
+                    <button onClick={updName}>ok</button>
+                    <button 
+                        onClick={e => {
+                            setChName(false);
+                            setName(name);
+                        }}
+                    >x</button>
+                </>
+            }
+            
+        </div>
         <span className="price">{price}</span>
         <div>
             <button onClick={add}>Add to cart</button>
